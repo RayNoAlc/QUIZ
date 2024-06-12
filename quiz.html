@@ -5,330 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Brazilix Quiz</title>
   <style>
-    /* Reset CSS */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    /* Estilos gerais */
-    body {
-      font-family: 'Roboto', sans-serif;
-      color: #333;
-      line-height: 1.5;
-      overflow-x: hidden;
-      background: linear-gradient(to right, #2c3e50, #bdc3c7);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    header {
-      background-color: #1abc9c;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      font-size: 2em;
-    }
-
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      position: relative;
-    }
-
-    .question-container,
-    .feedback-container {
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
-      text-align: center;
-      width: 100%;
-      max-width: 600px;
-      position: relative;
-    }
-
-    h2 {
-      font-size: 1.8em;
-      margin-bottom: 20px;
-    }
-
-    .options {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .option {
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 1.2em;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-
-    .option.correct {
-      background: #2ecc71;
-      animation: correctEffect 1s ease;
-    }
-
-    .option.incorrect {
-      background: #e74c3c;
-      opacity: 0.8;
-      animation: incorrectEffect 1s ease;
-    }
-
-    .option:hover {
-      transform: scale(1.05);
-    }
-
-    @keyframes correctEffect {
-      0% { transform: scale(1); }
-      70% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    @keyframes incorrectEffect {
-      0% { transform: scale(1); }
-      70% { transform: scale(0.9); }
-      100% { transform: scale(1); }
-    }
-
-    #result.hidden {
-      display: none;
-    }
-
-    #result {
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      animation: fadeInResult 1s ease-out forwards;
-    }
-
-    #result-message {
-      font-size: 2.5em;
-      margin-bottom: 20px;
-      color: #34495e;
-      animation: bounceIn 1s ease-out forwards;
-    }
-
-    #score {
-      font-size: 2em;
-      margin-top: 10px;
-      color: #2980b9;
-      animation: slideIn 1s ease-out forwards;
-    }
-
-    @keyframes fadeInResult {
-      0% {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    @keyframes bounceIn {
-      0% {
-        transform: scale(0.5);
-        opacity: 0.5;
-      }
-      70% {
-        transform: scale(1.1);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(1);
-      }
-    }
-
-    @keyframes slideIn {
-      0% {
-        transform: translateY(50px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .next-button,
-    .restart-button,
-    .feedback-button {
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      margin-top: 20px;
-      border-radius: 5px;
-      font-size: 1.2em;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .next-button:hover,
-    .restart-button:hover,
-    .feedback-button:hover {
-      background: #2980b9;
-    }
-
-    .restart-button {
-      font-size: 1em;
-      padding: 10px 15px;
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      z-index: 10;
-    }
-
-    .score-container {
-      margin-top: 20px;
-      font-size: 1.3em;
-    }
-
-    #particles-js {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      z-index: -1;
-    }
-
-    #feedback {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
-      text-align: center;
-      width: 100%;
-      max-width: 600px;
-      margin-top: 20px;
-    }
-
-    #feedback h2 {
-      font-size: 1.8em;
-      margin-bottom: 20px;
-    }
-
-    #feedback .incorrect-questions {
-      text-align: left;
-      margin-top: 10px;
-    }
-
-    .incorrect-answer {
-      color: #e74c3c;
-      font-weight: bold;
-    }
-
-    .correct-answer {
-      color: #2ecc71;
-      font-weight: bold;
-    }
-
-    .incorrect-question {
-      margin-bottom: 15px;
-      background: #f2d7d5;
-      padding: 10px;
-      border-radius: 10px;
-      border-left: 5px solid #e74c3c;
-    }
-
-    .timer {
-      width: 100%;
-      height: 30px;
-      background: #ecf0f1;
-      border-radius: 15px;
-      margin-bottom: 20px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .timer-bar {
-      height: 100%;
-      background: #1abc9c;
-      width: 0;
-      transition: width 0.5s linear, background-color 0.5s linear;
-    }
-
-    .timer-bar.add-time {
-      animation: blink 1s linear;
-    }
-
-    @keyframes blink {
-      0% { background-color: #1abc9c; }
-      50% { background-color: #2ecc71; }
-      100% { background-color: #1abc9c; }
-    }
-
-    .time-added {
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.5em;
-      color: #2ecc71;
-      opacity: 0;
-      animation: fadeOut 2s ease-in-out;
-    }
-
-    @keyframes fadeOut {
-      0% { opacity: 1; top: -30px; }
-      100% { opacity: 0; top: -60px; }
-    }
-
-    .incorrect-animation {
-      animation: shake 0.5s;
-    }
-
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-5px); }
-      100% { transform: translateX(0); }
-    }
-
-    .score-display {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #1abc9c;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 1.2em;
-      z-index: 10;
-      animation: fadeInScore 1s ease-in-out;
-    }
-
-    @keyframes fadeInScore {
-      0% {
-        opacity: 0;
-        transform: translateX(50px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
+    /* Estilos gerais e reset CSS */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Roboto', sans-serif; color: #333; line-height: 1.5; overflow-x: hidden; background: linear-gradient(to right, #2c3e50, #bdc3c7); display: flex; flex-direction: column; min-height: 100vh; }
+    header { background-color: #1abc9c; color: white; text-align: center; padding: 20px; font-size: 2em; }
+    main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; position: relative; }
+    .question-container, .feedback-container { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.2); text-align: center; width: 100%; max-width: 600px; position: relative; }
+    h2 { font-size: 1.8em; margin-bottom: 20px; }
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .option { background: #3498db; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 1.2em; cursor: pointer; transition: background-color 0.3s ease, transform 0.3s ease; }
+    .option.correct { background: #2ecc71; animation: correctEffect 1s ease; }
+    .option.incorrect { background: #e74c3c; opacity: 0.8; animation: incorrectEffect 1s ease; }
+    .option:hover { transform: scale(1.05); }
+    @keyframes correctEffect { 0% { transform: scale(1); } 70% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    @keyframes incorrectEffect { 0% { transform: scale(1); } 70% { transform: scale(0.9); } 100% { transform: scale(1); } }
+    #result.hidden { display: none; }
+    #result { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeInResult 1s ease-out forwards; }
+    #result-message { font-size: 2.5em; margin-bottom: 20px; color: #34495e; animation: bounceIn 1s ease-out forwards; }
+    #score { font-size: 2em; margin-top: 10px; color: #2980b9; animation: slideIn 1s ease-out forwards; }
+    @keyframes fadeInResult { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0.5; } 70% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
+    @keyframes slideIn { 0% { transform: translateY(50px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+    .next-button, .restart-button, .feedback-button { background: #3498db; color: white; border: none; padding: 10px 20px; margin-top: 20px; border-radius: 5px; font-size: 1.2em; cursor: pointer; transition: background-color 0.3s ease; }
+    .next-button:hover, .restart-button:hover, .feedback-button:hover { background: #2980b9; }
+    .restart-button { font-size: 1em; padding: 10px 15px; position: fixed; bottom: 10px; right: 10px; z-index: 10; }
+    .score-container { margin-top: 20px; font-size: 1.3em; }
+    #particles-js { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
+    #feedback { display: none; flex-direction: column; align-items: center; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.2); text-align: center; width: 100%; max-width: 600px; margin-top: 20px; }
+    #feedback h2 { font-size: 1.8em; margin-bottom: 20px; }
+    #feedback .incorrect-questions { text-align: left; margin-top: 10px; }
+    .incorrect-answer { color: #e74c3c; font-weight: bold; }
+    .correct-answer { color: #2ecc71; font-weight: bold; }
+    .incorrect-question { margin-bottom: 15px; background: #f2d7d5; padding: 10px; border-radius: 10px; border-left: 5px solid #e74c3c; }
+    .timer { width: 100%; height: 30px; background: #ecf0f1; border-radius: 15px; margin-bottom: 20px; overflow: hidden; position: relative; }
+    .timer-bar { height: 100%; background: #1abc9c; width: 0; transition: width 0.5s linear, background-color 0.5s linear; }
+    .timer-bar.add-time { animation: blink 1s linear; }
+    @keyframes blink { 0% { background-color: #1abc9c; } 50% { background-color: #2ecc71; } 100% { background-color: #1abc9c; } }
+    .time-added { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-size: 1.5em; color: #2ecc71; opacity: 0; animation: fadeOut 2s ease-in-out; }
+    @keyframes fadeOut { 0% { opacity: 1; top: -30px; } 100% { opacity: 0; top: -60px; } }
+    .incorrect-animation { animation: shake 0.5s; }
+    @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
+    .score-display { position: fixed; top: 20px; right: 20px; background: #1abc9c; color: white; padding: 10px 20px; border-radius: 10px; font-size: 1.2em; z-index: 10; animation: fadeInScore 1s ease-in-out; }
+    @keyframes fadeInScore { 0% { opacity: 0; transform: translateX(50px); } 100% { opacity: 1; transform: translateX(0); } }
   </style>
 </head>
 <body class="fade-in">
@@ -487,7 +205,10 @@
       const difficulty = urlParams.get('difficulty');
       let timeLimit;
       let quizData;
-      if (difficulty === 'easy') {
+      if (difficulty === null) {
+        timeLimit = 60;
+        quizData = easyQuizData;
+      } else if (difficulty === 'easy') {
         timeLimit = 60;
         quizData = easyQuizData;
       } else if (difficulty === 'medium') {
@@ -497,11 +218,9 @@
         timeLimit = 15;
         quizData = hardQuizData;
       }
+      preloadAudio();
+      playBackgroundMusic();
       startQuiz(timeLimit, quizData);
-      document.getElementById('background-music').volume = 0.2;
-      document.getElementById('background-music').play().catch(error => {
-        console.error("Erro ao tocar a música de fundo: ", error);
-      });
     });
 
     const easyQuizData = [
@@ -514,7 +233,38 @@
       { question: "Qual é o principal rio do Brasil?", options: ["Rio Amazonas", "Rio Paraná", "Rio São Francisco", "Rio Tocantins"], answer: 0 },
       { question: "Quem foi o primeiro presidente do Brasil?", options: ["Getúlio Vargas", "Juscelino Kubitschek", "Deodoro da Fonseca", "Dom Pedro II"], answer: 2 },
       { question: "Qual é a montanha mais alta do Brasil?", options: ["Pico da Neblina", "Pico das Agulhas Negras", "Pico do Jaraguá", "Pico da Bandeira"], answer: 0 },
-      { question: "Em que ano foi proclamada a República no Brasil?", options: ["1808", "1822", "1889", "1891"], answer: 2 }
+      { question: "Em que ano foi proclamada a República no Brasil?", options: ["1808", "1822", "1889", "1891"], answer: 2 },
+      // Perguntas adicionais
+      { question: "Qual é a capital de Minas Gerais?", options: ["Belo Horizonte", "Rio de Janeiro", "São Paulo", "Brasília"], answer: 0 },
+      { question: "Qual é o maior estado do Nordeste do Brasil?", options: ["Bahia", "Ceará", "Pernambuco", "Maranhão"], answer: 0 },
+      { question: "Em que continente está localizado o Brasil?", options: ["América do Sul", "América do Norte", "Europa", "Ásia"], answer: 0 },
+      { question: "Qual é a cor da bandeira do Brasil que representa as florestas?", options: ["Verde", "Amarelo", "Azul", "Branco"], answer: 0 },
+      { question: "Quantas cores tem a bandeira do Brasil?", options: ["Quatro", "Três", "Cinco", "Seis"], answer: 0 },
+      { question: "Qual é o maior rio do Brasil?", options: ["Amazonas", "Paraná", "São Francisco", "Tocantins"], answer: 0 },
+      { question: "Qual é o nome do famoso carnaval no Brasil?", options: ["Carnaval do Rio de Janeiro", "Carnaval de São Paulo", "Carnaval de Salvador", "Carnaval de Recife"], answer: 0 },
+      { question: "Qual é a moeda oficial do Brasil?", options: ["Real", "Dólar", "Peso", "Euro"], answer: 0 },
+      { question: "Qual é a língua oficial do Brasil?", options: ["Português", "Espanhol", "Inglês", "Francês"], answer: 0 },
+      { question: "Qual é o símbolo nacional do Brasil?", options: ["Cruzeiro do Sul", "Bandeira", "Hino", "Brasão"], answer: 0 },
+      { question: "Qual é o prato típico brasileiro?", options: ["Feijoada", "Pizza", "Sushi", "Tacos"], answer: 0 },
+      { question: "Qual é a bebida alcoólica mais popular no Brasil?", options: ["Caipirinha", "Tequila", "Vodka", "Rum"], answer: 0 },
+      { question: "Qual é o esporte mais popular no Brasil?", options: ["Futebol", "Basquete", "Vôlei", "Tênis"], answer: 0 },
+      { question: "Qual é o maior estádio de futebol do Brasil?", options: ["Maracanã", "Mineirão", "Morumbi", "Beira-Rio"], answer: 0 },
+      { question: "Em que cidade está localizado o Cristo Redentor?", options: ["Rio de Janeiro", "São Paulo", "Brasília", "Salvador"], answer: 0 },
+      { question: "Qual é a festa junina mais famosa do Brasil?", options: ["São João", "São Pedro", "Santo Antônio", "São Paulo"], answer: 0 },
+      { question: "Qual é o ponto turístico mais visitado no Brasil?", options: ["Cristo Redentor", "Pão de Açúcar", "Cataratas do Iguaçu", "Pelourinho"], answer: 0 },
+      { question: "Qual é o maior bioma do Brasil?", options: ["Amazônia", "Cerrado", "Pantanal", "Caatinga"], answer: 0 },
+      { question: "Qual é o maior festival de música do Brasil?", options: ["Rock in Rio", "Lollapalooza", "Planeta Atlântida", "Villa Mix"], answer: 0 },
+      { question: "Qual é o maior produtor de café do Brasil?", options: ["Minas Gerais", "São Paulo", "Paraná", "Espírito Santo"], answer: 0 },
+      { question: "Em que estado está a cidade de Porto Alegre?", options: ["Rio Grande do Sul", "Santa Catarina", "Paraná", "São Paulo"], answer: 0 },
+      { question: "Qual é o maior estado em área do Brasil?", options: ["Amazonas", "Pará", "Mato Grosso", "Bahia"], answer: 0 },
+      { question: "Qual é a cidade mais populosa do Brasil?", options: ["São Paulo", "Rio de Janeiro", "Brasília", "Salvador"], answer: 0 },
+      { question: "Em que estado está a cidade de Fortaleza?", options: ["Ceará", "Pernambuco", "Bahia", "Paraíba"], answer: 0 },
+      { question: "Qual é o menor estado do Brasil em área?", options: ["Sergipe", "Alagoas", "Rio de Janeiro", "Espírito Santo"], answer: 0 },
+      { question: "Qual é o principal rio da região Norte do Brasil?", options: ["Amazonas", "Tocantins", "Negro", "Solimões"], answer: 0 },
+      { question: "Qual é a capital do estado da Bahia?", options: ["Salvador", "Feira de Santana", "Ilhéus", "Porto Seguro"], answer: 0 },
+      { question: "Em que cidade está a sede do governo brasileiro?", options: ["Brasília", "Rio de Janeiro", "São Paulo", "Belo Horizonte"], answer: 0 },
+      { question: "Qual é a cidade brasileira conhecida como 'Cidade Maravilhosa'?", options: ["Rio de Janeiro", "São Paulo", "Salvador", "Recife"], answer: 0 },
+      { question: "Qual é o nome do famoso estádio de futebol no Rio de Janeiro?", options: ["Maracanã", "Mineirão", "Morumbi", "Beira-Rio"], answer: 0 }
     ];
 
     const mediumQuizData = [
@@ -527,7 +277,38 @@
       { question: "Qual é a capital do estado do Rio de Janeiro?", options: ["Niterói", "Petrópolis", "Rio de Janeiro", "Cabo Frio"], answer: 2 },
       { question: "Qual é o principal produto agrícola do Brasil?", options: ["Milho", "Cana-de-açúcar", "Café", "Soja"], answer: 3 },
       { question: "Quem foi o descobridor do Brasil?", options: ["Cristóvão Colombo", "Pedro Álvares Cabral", "Fernão de Magalhães", "Vasco da Gama"], answer: 1 },
-      { question: "Qual é o prato típico mais conhecido do Brasil?", options: ["Feijoada", "Moqueca", "Churrasco", "Vatapá"], answer: 0 }
+      { question: "Qual é o prato típico mais conhecido do Brasil?", options: ["Feijoada", "Moqueca", "Churrasco", "Vatapá"], answer: 0 },
+      // Perguntas adicionais
+      { question: "Qual é o maior produtor de soja do Brasil?", options: ["Mato Grosso", "Paraná", "Goiás", "Bahia"], answer: 0 },
+      { question: "Qual é a capital do estado de Pernambuco?", options: ["Recife", "Olinda", "Caruaru", "Jaboatão dos Guararapes"], answer: 0 },
+      { question: "Qual é o segundo maior bioma do Brasil?", options: ["Cerrado", "Mata Atlântica", "Pantanal", "Caatinga"], answer: 0 },
+      { question: "Qual é o principal mineral extraído em Minas Gerais?", options: ["Ferro", "Ouro", "Níquel", "Cobre"], answer: 0 },
+      { question: "Qual é a capital do estado do Amazonas?", options: ["Manaus", "Belém", "Porto Velho", "Boa Vista"], answer: 0 },
+      { question: "Qual é a capital do estado do Mato Grosso do Sul?", options: ["Campo Grande", "Cuiabá", "Dourados", "Três Lagoas"], answer: 0 },
+      { question: "Qual é o maior estado em população do Brasil?", options: ["São Paulo", "Minas Gerais", "Rio de Janeiro", "Bahia"], answer: 0 },
+      { question: "Qual é o principal produto exportado pelo Brasil?", options: ["Soja", "Café", "Açúcar", "Carne"], answer: 0 },
+      { question: "Qual é a cidade mais populosa da região Norte do Brasil?", options: ["Manaus", "Belém", "Macapá", "Porto Velho"], answer: 0 },
+      { question: "Qual é a capital do estado do Paraná?", options: ["Curitiba", "Londrina", "Maringá", "Foz do Iguaçu"], answer: 0 },
+      { question: "Qual é o maior produtor de açúcar do Brasil?", options: ["São Paulo", "Alagoas", "Pernambuco", "Goiás"], answer: 0 },
+      { question: "Qual é o principal rio da região Nordeste do Brasil?", options: ["São Francisco", "Parnaíba", "Jaguaribe", "Capibaribe"], answer: 0 },
+      { question: "Qual é a capital do estado do Pará?", options: ["Belém", "Macapá", "Manaus", "Santarém"], answer: 0 },
+      { question: "Qual é a principal cidade turística da Bahia?", options: ["Salvador", "Porto Seguro", "Ilhéus", "Itacaré"], answer: 0 },
+      { question: "Qual é o maior produtor de carne bovina do Brasil?", options: ["Mato Grosso", "Goiás", "São Paulo", "Minas Gerais"], answer: 0 },
+      { question: "Qual é o principal rio da região Centro-Oeste do Brasil?", options: ["Paraná", "Araguaia", "Paraguai", "Tocantins"], answer: 0 },
+      { question: "Qual é a capital do estado de Santa Catarina?", options: ["Florianópolis", "Joinville", "Blumenau", "Chapecó"], answer: 0 },
+      { question: "Qual é o maior estado em área da região Nordeste do Brasil?", options: ["Bahia", "Maranhão", "Ceará", "Pernambuco"], answer: 0 },
+      { question: "Qual é o principal destino turístico do estado do Rio de Janeiro?", options: ["Copacabana", "Búzios", "Angra dos Reis", "Paraty"], answer: 0 },
+      { question: "Qual é a maior cidade do estado de Minas Gerais?", options: ["Belo Horizonte", "Uberlândia", "Contagem", "Juiz de Fora"], answer: 0 },
+      { question: "Qual é o principal aeroporto de São Paulo?", options: ["Guarulhos", "Congonhas", "Viracopos", "Santos Dumont"], answer: 0 },
+      { question: "Qual é a principal avenida de São Paulo?", options: ["Avenida Paulista", "Avenida Faria Lima", "Avenida Brigadeiro", "Avenida 9 de Julho"], answer: 0 },
+      { question: "Qual é o principal rio da região Sul do Brasil?", options: ["Paraná", "Uruguai", "Iguaçu", "Jacuí"], answer: 0 },
+      { question: "Qual é a capital do estado de Goiás?", options: ["Goiânia", "Anápolis", "Aparecida de Goiânia", "Rio Verde"], answer: 0 },
+      { question: "Qual é a principal atividade econômica do estado do Paraná?", options: ["Agricultura", "Indústria", "Turismo", "Comércio"], answer: 0 },
+      { question: "Qual é a principal cidade turística do estado do Espírito Santo?", options: ["Vitória", "Vila Velha", "Guarapari", "Linhares"], answer: 0 },
+      { question: "Qual é o principal destino turístico do estado de Pernambuco?", options: ["Porto de Galinhas", "Fernando de Noronha", "Recife", "Olinda"], answer: 0 },
+      { question: "Qual é a maior cidade do estado do Rio Grande do Sul?", options: ["Porto Alegre", "Caxias do Sul", "Pelotas", "Santa Maria"], answer: 0 },
+      { question: "Qual é a capital do estado do Maranhão?", options: ["São Luís", "Imperatriz", "Caxias", "Timon"], answer: 0 },
+      { question: "Qual é a maior cidade do estado do Pará?", options: ["Belém", "Ananindeua", "Santarém", "Marabá"], answer: 0 }
     ];
 
     const hardQuizData = [
@@ -540,7 +321,38 @@
       { question: "Qual é o estado brasileiro conhecido como Terra do Sol?", options: ["Ceará", "Pernambuco", "Bahia", "Maranhão"], answer: 0 },
       { question: "Qual é o nome do estádio mais famoso do Brasil?", options: ["Morumbi", "Mineirão", "Maracanã", "Arena Corinthians"], answer: 2 },
       { question: "Qual é a região do Brasil com maior extensão territorial?", options: ["Sul", "Sudeste", "Centro-Oeste", "Norte"], answer: 3 },
-      { question: "Qual é o nome do atual presidente do Brasil?", options: ["Luiz Inácio Lula da Silva", "Jair Bolsonaro", "Dilma Rousseff", "Fernando Henrique Cardoso"], answer: 0 }
+      { question: "Qual é o nome do atual presidente do Brasil?", options: ["Luiz Inácio Lula da Silva", "Jair Bolsonaro", "Dilma Rousseff", "Fernando Henrique Cardoso"], answer: 0 },
+      // Perguntas adicionais
+      { question: "Qual é o menor estado em população do Brasil?", options: ["Roraima", "Amapá", "Acre", "Tocantins"], answer: 0 },
+      { question: "Qual é o rio mais extenso do Brasil?", options: ["Amazonas", "São Francisco", "Tocantins", "Paraná"], answer: 0 },
+      { question: "Qual é o principal rio da região Sul do Brasil?", options: ["Uruguai", "Jacuí", "Iguaçu", "Paraná"], answer: 0 },
+      { question: "Qual é a capital do estado de Roraima?", options: ["Boa Vista", "Macapá", "Rio Branco", "Porto Velho"], answer: 0 },
+      { question: "Qual é o maior produtor de milho do Brasil?", options: ["Mato Grosso", "Paraná", "Goiás", "Minas Gerais"], answer: 0 },
+      { question: "Qual é o principal destino turístico do estado de Alagoas?", options: ["Maceió", "Maragogi", "Penedo", "Arapiraca"], answer: 0 },
+      { question: "Qual é a capital do estado de Tocantins?", options: ["Palmas", "Araguaína", "Gurupi", "Porto Nacional"], answer: 0 },
+      { question: "Qual é o principal destino turístico do estado do Ceará?", options: ["Fortaleza", "Jericoacoara", "Canoa Quebrada", "Cumbuco"], answer: 0 },
+      { question: "Qual é o maior produtor de petróleo do Brasil?", options: ["Rio de Janeiro", "São Paulo", "Bahia", "Espírito Santo"], answer: 0 },
+      { question: "Qual é a capital do estado do Acre?", options: ["Rio Branco", "Porto Velho", "Manaus", "Macapá"], answer: 0 },
+      { question: "Qual é a principal atividade econômica do estado de Rondônia?", options: ["Agricultura", "Pecuária", "Mineração", "Indústria"], answer: 0 },
+      { question: "Qual é a capital do estado do Amapá?", options: ["Macapá", "Belém", "Manaus", "Boa Vista"], answer: 0 },
+      { question: "Qual é o maior produtor de café do Brasil?", options: ["Minas Gerais", "Espírito Santo", "São Paulo", "Paraná"], answer: 0 },
+      { question: "Qual é a principal atividade econômica do estado de Sergipe?", options: ["Indústria", "Agricultura", "Pesca", "Comércio"], answer: 0 },
+      { question: "Qual é a capital do estado de Sergipe?", options: ["Aracaju", "Maceió", "Salvador", "Recife"], answer: 0 },
+      { question: "Qual é a capital do estado de Rondônia?", options: ["Porto Velho", "Rio Branco", "Manaus", "Macapá"], answer: 0 },
+      { question: "Qual é a principal cidade turística do estado do Rio Grande do Norte?", options: ["Natal", "Mossoró", "Pipa", "Caicó"], answer: 0 },
+      { question: "Qual é o principal destino turístico do estado do Mato Grosso?", options: ["Chapada dos Guimarães", "Pantanal", "Cuiabá", "Rondonópolis"], answer: 0 },
+      { question: "Qual é a capital do estado do Mato Grosso?", options: ["Cuiabá", "Campo Grande", "Rondonópolis", "Sinop"], answer: 0 },
+      { question: "Qual é o maior produtor de algodão do Brasil?", options: ["Mato Grosso", "Bahia", "Goiás", "Minas Gerais"], answer: 0 },
+      { question: "Qual é a capital do estado do Espírito Santo?", options: ["Vitória", "Vila Velha", "Cariacica", "Serra"], answer: 0 },
+      { question: "Qual é o maior produtor de carne suína do Brasil?", options: ["Santa Catarina", "Paraná", "Rio Grande do Sul", "Minas Gerais"], answer: 0 },
+      { question: "Qual é a capital do estado do Piauí?", options: ["Teresina", "Parnaíba", "Picos", "Floriano"], answer: 0 },
+      { question: "Qual é o principal destino turístico do estado do Amazonas?", options: ["Manaus", "Presidente Figueiredo", "Parintins", "Tefé"], answer: 0 },
+      { question: "Qual é a maior cidade do estado do Maranhão?", options: ["São Luís", "Imperatriz", "Caxias", "Timon"], answer: 0 },
+      { question: "Qual é a capital do estado da Paraíba?", options: ["João Pessoa", "Campina Grande", "Patos", "Sousa"], answer: 0 },
+      { question: "Qual é o maior produtor de etanol do Brasil?", options: ["São Paulo", "Goiás", "Minas Gerais", "Paraná"], answer: 0 },
+      { question: "Qual é a principal cidade turística do estado de Mato Grosso do Sul?", options: ["Bonito", "Campo Grande", "Corumbá", "Dourados"], answer: 0 },
+      { question: "Qual é a capital do estado do Rio Grande do Norte?", options: ["Natal", "Mossoró", "Parnamirim", "Caicó"], answer: 0 },
+      { question: "Qual é a maior cidade do estado de Tocantins?", options: ["Palmas", "Araguaína", "Gurupi", "Porto Nacional"], answer: 0 }
     ];
 
     let currentQuestionIndex = 0;
@@ -551,6 +363,7 @@
     let timeIncrement;
     let timeLimit;
     let timerBar;
+    let alertSoundPlayed = false;
 
     function startQuiz(timeLimitParam, quizDataParam) {
       currentQuestionIndex = 0;
@@ -559,6 +372,7 @@
       quizData = quizDataParam;
       timeRemaining = timeLimitParam;
       timeLimit = timeLimitParam;
+      alertSoundPlayed = false;
 
       document.getElementById('quiz').classList.add('active');
       document.getElementById('result').classList.add('hidden');
@@ -569,7 +383,6 @@
       showQuestion();
       resetTimer();
       updateScoreDisplay();
-      preloadAudio();
     }
 
     function setTimeIncrement() {
@@ -593,6 +406,7 @@
         option.disabled = false;
         option.onclick = () => checkAnswer(index);
       });
+      alertSoundPlayed = false;  // Reset alert sound flag for new question
     }
 
     function checkAnswer(selectedIndex) {
@@ -600,6 +414,9 @@
       const options = document.querySelectorAll('.option');
       const correctSound = document.getElementById('correct-sound');
       const incorrectSound = document.getElementById('incorrect-sound');
+      const alertSound = document.getElementById('timeout-sound');
+
+      alertSound.pause(); // Stop alert sound on answer
 
       if (selectedIndex === questionData.answer) {
         score += timeRemaining;
@@ -607,6 +424,7 @@
         options[selectedIndex].classList.add('correct');
         addTime(timeIncrement);
         animateScoreIncrement();
+        correctSound.currentTime = 0;
         correctSound.play();
       } else {
         options[selectedIndex].classList.add('incorrect');
@@ -617,6 +435,7 @@
           selected: questionData.options[selectedIndex],
           correct: questionData.options[questionData.answer],
         });
+        incorrectSound.currentTime = 0;
         incorrectSound.play();
       }
       options.forEach(option => option.disabled = true);
@@ -677,8 +496,9 @@
         if (timeRemaining < 0) {
           timeRemaining = 0;
         }
-        if (timeRemaining === 5) {
+        if (timeRemaining === 5 && !alertSoundPlayed) {
           playAlertSound();
+          alertSoundPlayed = true; // Ensure alert sound only plays once per question
         }
         updateTimerDisplay();
         if (timeRemaining <= 0) {
@@ -689,20 +509,19 @@
     }
 
     function playAlertSound() {
-  const alertSound = document.getElementById('timeout-sound');
-  if (alertSound.readyState >= 2) {
-    alertSound.play().catch(error => {
-      console.error("Erro ao tocar o áudio: ", error);
-    });
-  } else {
-    alertSound.oncanplaythrough = () => {
-      alertSound.play().catch(error => {
-        console.error("Erro ao tocar o áudio: ", error);
-      });
-    };
-  }
-}
-
+      const alertSound = document.getElementById('timeout-sound');
+      if (alertSound.readyState >= 2) {
+        alertSound.play().catch(error => {
+          console.error("Erro ao tocar o áudio: ", error);
+        });
+      } else {
+        alertSound.oncanplaythrough = () => {
+          alertSound.play().catch(error => {
+            console.error("Erro ao tocar o áudio: ", error);
+          });
+        };
+      }
+    }
 
     function endQuizDueToTimeout() {
       const timeoutSound = document.getElementById('timeout-sound');
@@ -769,10 +588,18 @@
     }
 
     function preloadAudio() {
-      const sounds = ['correct-sound', 'incorrect-sound', 'timeout-sound', 'end-sound'];
+      const sounds = ['correct-sound', 'incorrect-sound', 'timeout-sound', 'end-sound', 'background-music'];
       sounds.forEach(soundId => {
         const sound = document.getElementById(soundId);
         sound.load();
+      });
+    }
+
+    function playBackgroundMusic() {
+      const backgroundMusic = document.getElementById('background-music');
+      backgroundMusic.volume = 0.2;
+      backgroundMusic.play().catch(error => {
+        console.error("Erro ao tocar a música de fundo: ", error);
       });
     }
   </script>
