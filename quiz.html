@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brazilix Quiz</title>
+  <style>
+    /* Reset CSS */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Estilos gerais */
+    body {
+      font-family: 'Roboto', sans-serif;
+      color: #333;
+      line-height: 1.5;
+      overflow-x: hidden;
+      background: linear-gradient(to right, #2c3e50, #bdc3c7);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: #1abc9c;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 2em;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .question-container,
+    .feedback-container {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+    }
+
+    h2 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .option.correct {
+      background: #2ecc71;
+      animation: correctEffect 1s ease;
+    }
+
+    .option.incorrect {
+      background: #e74c3c;
+      opacity: 0.8;
+      animation: incorrectEffect 1s ease;
+    }
+
+    .option:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes correctEffect {
+      0% { transform: scale(1); }
+      70% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes incorrectEffect {
+      0% { transform: scale(1); }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+
+    #result.hidden {
+      display: none;
+    }
+
+    #result {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: fadeInResult 1s ease-out forwards;
+    }
+
+    #result-message {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #34495e;
+      animation: bounceIn 1s ease-out forwards;
+    }
+
+    #score {
+      font-size: 2em;
+      margin-top: 10px;
+      color: #2980b9;
+      animation: slideIn 1s ease-out forwards;
+    }
+
+    @keyframes fadeInResult {
+      0% {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes bounceIn {
+      0% {
+        transform: scale(0.5);
+        opacity: 0.5;
+      }
+      70% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes slideIn {
+      0% {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .next-button,
+    .restart-button,
+    .feedback-button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 20px;
+      border-radius: 5px;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .next-button:hover,
+    .restart-button:hover,
+    .feedback-button:hover {
+      background: #2980b9;
+    }
+
+    .restart-button {
+      font-size: 1em;
+      padding: 10px 15px;
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      z-index: 10;
+    }
+
+    .score-container {
+      margin-top: 20px;
+      font-size: 1.3em;
+    }
+
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    #feedback {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 100%;
+      max-width: 600px;
+      margin-top: 20px;
+    }
+
+    #feedback h2 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+    }
+
+    #feedback .incorrect-questions {
+      text-align: left;
+      margin-top: 10px;
+    }
+
+    .incorrect-answer {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .correct-answer {
+      color: #2ecc71;
+      font-weight: bold;
+    }
+
+    .incorrect-question {
+      margin-bottom: 15px;
+      background: #f2d7d5;
+      padding: 10px;
+      border-radius: 10px;
+      border-left: 5px solid #e74c3c;
+    }
+
+    .timer {
+      width: 100%;
+      height: 30px;
+      background: #ecf0f1;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .timer-bar {
+      height: 100%;
+      background: #1abc9c;
+      width: 0;
+      transition: width 0.5s linear, background-color 0.5s linear;
+    }
+
+    .timer-bar.add-time {
+      animation: blink 1s linear;
+    }
+
+    @keyframes blink {
+      0% { background-color: #1abc9c; }
+      50% { background-color: #2ecc71; }
+      100% { background-color: #1abc9c; }
+    }
+
+    .time-added {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.5em;
+      color: #2ecc71;
+      opacity: 0;
+      animation: fadeOut 2s ease-in-out;
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; top: -30px; }
+      100% { opacity: 0; top: -60px; }
+    }
+
+    .incorrect-animation {
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+
+    .score-display {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #1abc9c;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1.2em;
+      z-index: 10;
+      animation: fadeInScore 1s ease-in-out;
+    }
+
+    @keyframes fadeInScore {
+      0% {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  </style>
+</head>
+<body class="fade-in">
+  <header>
+    <h1>Brazilix</h1>
+  </header>
+  <main>
+    <div id="particles-js"></div>
+    <section id="quiz" class="question-container active">
+      <h2 id="question">Pergunta aqui</h2>
+      <div class="timer" id="timer">
+        <div class="timer-bar" id="timer-bar"></div>
+      </div>
+      <div class="options">
+        <button class="option" onclick="checkAnswer(0)">Opção 1</button>
+        <button class="option" onclick="checkAnswer(1)">Opção 2</button>
+        <button class="option" onclick="checkAnswer(2)">Opção 3</button>
+        <button class="option" onclick="checkAnswer(3)">Opção 4</button>
+      </div>
+      <div id="time-added" class="time-added"></div>
+      <div id="score-display" class="score-display">Pontuação: 0</div>
+    </section>
+    <section id="result" class="hidden">
+      <h2 id="result-message"></h2>
+      <div class="score-container">
+        <div id="score"></div>
+      </div>
+      <button class="feedback-button" onclick="showFeedback()">Verificar Respostas</button>
+    </section>
+    <section id="feedback">
+      <h2>Respostas Incorretas</h2>
+      <div class="incorrect-questions"></div>
+      <button class="restart-button" onclick="restartQuiz()">Recomeçar</button>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2024 Brazilix</p>
+  </footer>
+  <audio id="correct-sound" src="correct-sound.mp3"></audio>
+  <audio id="incorrect-sound" src="incorrect-sound.mp3"></audio>
+  <audio id="timeout-sound" src="timeout-sound.mp3"></audio>
+  <audio id="end-sound" src="end-sound.mp3"></audio>
+  <audio id="background-music" src="background-music.mp3" loop></audio>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.classList.add("fade-in");
+
+      particlesJS("particles-js", {
+        "particles": {
+          "number": {
+            "value": 100,
+            "density": {
+              "enable": true,
+              "value_area": 800
+            }
+          },
+          "color": {
+            "value": "#888"
+          },
+          "shape": {
+            "type": "circle",
+            "stroke": {
+              "width": 0,
+              "color": "#888"
+            },
+            "polygon": {
+              "nb_sides": 5
+            }
+          },
+          "opacity": {
+            "value": 0.5,
+            "random": false,
+            "anim": {
+              "enable": false,
+              "speed": 1,
+              "opacity_min": 0.1,
+              "sync": false
+            }
+          },
+          "size": {
+            "value": 3,
+            "random": true,
+            "anim": {
+              "enable": false,
+              "speed": 40,
+              "size_min": 0.1,
+              "sync": false
+            }
+          },
+          "line_linked": {
+            "enable": true,
+            "distance": 150,
+            "color": "#888",
+            "opacity": 0.4,
+            "width": 1
+          },
+          "move": {
+            "enable": true,
+            "speed": 6,
+            "direction": "none",
+            "random": false,
+            "straight": false,
+            "out_mode": "out",
+            "bounce": false,
+            "attract": {
+              "enable": false,
+              "rotateX": 600,
+              "rotateY": 1200
+            }
+          }
+        },
+        "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+            "onhover": {
+              "enable": true,
+              "mode": "repulse"
+            },
+            "onclick": {
+              "enable": true,
+              "mode": "push"
+            },
+            "resize": true
+          },
+          "modes": {
+            "grab": {
+              "distance": 400,
+              "line_linked": {
+                "opacity": 1
+              }
+            },
+            "bubble": {
+              "distance": 400,
+              "size": 40,
+              "duration": 2,
+              "opacity": 8,
+              "speed": 3
+            },
+            "repulse": {
+              "distance": 200,
+              "duration": 0.4
+            },
+            "push": {
+              "particles_nb": 4
+            },
+            "remove": {
+              "particles_nb": 2
+            }
+          }
+        },
+        "retina_detect": true
+      });
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const difficulty = urlParams.get('difficulty');
+      let timeLimit;
+      let quizData;
+      if (difficulty === 'easy') {
+        timeLimit = 60;
+        quizData = easyQuizData;
+      } else if (difficulty === 'medium') {
+        timeLimit = 30;
+        quizData = mediumQuizData;
+      } else if (difficulty === 'hard') {
+        timeLimit = 15;
+        quizData = hardQuizData;
+      }
+      startQuiz(timeLimit, quizData);
+      document.getElementById('background-music').volume = 0.2;
+      document.getElementById('background-music').play().catch(error => {
+        console.error("Erro ao tocar a música de fundo: ", error);
+      });
+    });
+
+    const easyQuizData = [
+      { question: "Qual é a capital do Brasil?", options: ["Rio de Janeiro", "Brasília", "São Paulo", "Salvador"], answer: 1 },
+      { question: "Em que ano o Brasil foi descoberto?", options: ["1492", "1500", "1822", "1889"], answer: 1 },
+      { question: "Qual é o maior estado do Brasil?", options: ["Amazonas", "Pará", "Mato Grosso", "Minas Gerais"], answer: 0 },
+      { question: "Qual é o menor estado do Brasil?", options: ["Sergipe", "Alagoas", "Rio de Janeiro", "Espírito Santo"], answer: 0 },
+      { question: "Qual é a maior cidade do Brasil?", options: ["São Paulo", "Rio de Janeiro", "Brasília", "Salvador"], answer: 0 },
+      { question: "Qual é o idioma oficial do Brasil?", options: ["Espanhol", "Português", "Inglês", "Francês"], answer: 1 },
+      { question: "Qual é o principal rio do Brasil?", options: ["Rio Amazonas", "Rio Paraná", "Rio São Francisco", "Rio Tocantins"], answer: 0 },
+      { question: "Quem foi o primeiro presidente do Brasil?", options: ["Getúlio Vargas", "Juscelino Kubitschek", "Deodoro da Fonseca", "Dom Pedro II"], answer: 2 },
+      { question: "Qual é a montanha mais alta do Brasil?", options: ["Pico da Neblina", "Pico das Agulhas Negras", "Pico do Jaraguá", "Pico da Bandeira"], answer: 0 },
+      { question: "Em que ano foi proclamada a República no Brasil?", options: ["1808", "1822", "1889", "1891"], answer: 2 }
+    ];
+
+    const mediumQuizData = [
+      { question: "Qual é a principal exportação do Brasil?", options: ["Café", "Açúcar", "Soja", "Carne"], answer: 2 },
+      { question: "Quantos estados tem o Brasil?", options: ["24", "26", "27", "28"], answer: 2 },
+      { question: "Qual é o bioma mais predominante no Brasil?", options: ["Mata Atlântica", "Cerrado", "Caatinga", "Amazônia"], answer: 3 },
+      { question: "Qual é o nome da moeda do Brasil?", options: ["Real", "Peso", "Dólar", "Cruzeiro"], answer: 0 },
+      { question: "Qual é a capital do estado de São Paulo?", options: ["Campinas", "São Paulo", "Santos", "Sorocaba"], answer: 1 },
+      { question: "Qual é o segundo maior estado do Brasil em área?", options: ["Minas Gerais", "Pará", "Amazonas", "Mato Grosso"], answer: 1 },
+      { question: "Qual é a capital do estado do Rio de Janeiro?", options: ["Niterói", "Petrópolis", "Rio de Janeiro", "Cabo Frio"], answer: 2 },
+      { question: "Qual é o principal produto agrícola do Brasil?", options: ["Milho", "Cana-de-açúcar", "Café", "Soja"], answer: 3 },
+      { question: "Quem foi o descobridor do Brasil?", options: ["Cristóvão Colombo", "Pedro Álvares Cabral", "Fernão de Magalhães", "Vasco da Gama"], answer: 1 },
+      { question: "Qual é o prato típico mais conhecido do Brasil?", options: ["Feijoada", "Moqueca", "Churrasco", "Vatapá"], answer: 0 }
+    ];
+
+    const hardQuizData = [
+      { question: "Qual é o país que faz fronteira ao norte do Brasil?", options: ["Venezuela", "Argentina", "Peru", "Chile"], answer: 0 },
+      { question: "Quantas regiões geográficas o Brasil possui?", options: ["3", "4", "5", "6"], answer: 2 },
+      { question: "Qual é o ponto turístico mais famoso do Rio de Janeiro?", options: ["Maracanã", "Cristo Redentor", "Pão de Açúcar", "Copacabana"], answer: 1 },
+      { question: "Qual foi a primeira capital do Brasil?", options: ["Brasília", "Rio de Janeiro", "Salvador", "Recife"], answer: 2 },
+      { question: "Qual é o estado mais populoso do Brasil?", options: ["São Paulo", "Rio de Janeiro", "Minas Gerais", "Bahia"], answer: 0 },
+      { question: "Em que ano foi inaugurada Brasília?", options: ["1956", "1960", "1964", "1968"], answer: 1 },
+      { question: "Qual é o estado brasileiro conhecido como Terra do Sol?", options: ["Ceará", "Pernambuco", "Bahia", "Maranhão"], answer: 0 },
+      { question: "Qual é o nome do estádio mais famoso do Brasil?", options: ["Morumbi", "Mineirão", "Maracanã", "Arena Corinthians"], answer: 2 },
+      { question: "Qual é a região do Brasil com maior extensão territorial?", options: ["Sul", "Sudeste", "Centro-Oeste", "Norte"], answer: 3 },
+      { question: "Qual é o nome do atual presidente do Brasil?", options: ["Luiz Inácio Lula da Silva", "Jair Bolsonaro", "Dilma Rousseff", "Fernando Henrique Cardoso"], answer: 0 }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let incorrectQuestions = [];
+    let timer;
+    let timeRemaining;
+    let timeIncrement;
+    let timeLimit;
+    let timerBar;
+
+    function startQuiz(timeLimitParam, quizDataParam) {
+      currentQuestionIndex = 0;
+      score = 0;
+      incorrectQuestions = [];
+      quizData = quizDataParam;
+      timeRemaining = timeLimitParam;
+      timeLimit = timeLimitParam;
+
+      document.getElementById('quiz').classList.add('active');
+      document.getElementById('result').classList.add('hidden');
+      document.getElementById('feedback').style.display = 'none';
+      document.querySelector('.question-container').style.display = 'block';
+
+      setTimeIncrement();
+      showQuestion();
+      resetTimer();
+      updateScoreDisplay();
+      preloadAudio();
+    }
+
+    function setTimeIncrement() {
+      const difficulty = new URLSearchParams(window.location.search).get('difficulty');
+      if (difficulty === 'easy') {
+        timeIncrement = 5;
+      } else if (difficulty === 'medium') {
+        timeIncrement = 10;
+      } else if (difficulty === 'hard') {
+        timeIncrement = 15;
+      }
+    }
+
+    function showQuestion() {
+      const questionData = quizData[currentQuestionIndex];
+      document.getElementById('question').textContent = questionData.question;
+      const options = document.querySelectorAll('.option');
+      options.forEach((option, index) => {
+        option.textContent = questionData.options[index];
+        option.classList.remove('correct', 'incorrect', 'incorrect-animation');
+        option.disabled = false;
+        option.onclick = () => checkAnswer(index);
+      });
+    }
+
+    function checkAnswer(selectedIndex) {
+      const questionData = quizData[currentQuestionIndex];
+      const options = document.querySelectorAll('.option');
+      const correctSound = document.getElementById('correct-sound');
+      const incorrectSound = document.getElementById('incorrect-sound');
+
+      if (selectedIndex === questionData.answer) {
+        score += timeRemaining;
+        updateScoreDisplay();
+        options[selectedIndex].classList.add('correct');
+        addTime(timeIncrement);
+        animateScoreIncrement();
+        correctSound.play();
+      } else {
+        options[selectedIndex].classList.add('incorrect');
+        options[selectedIndex].classList.add('incorrect-animation');
+        options[questionData.answer].classList.add('correct');
+        incorrectQuestions.push({
+          question: questionData.question,
+          selected: questionData.options[selectedIndex],
+          correct: questionData.options[questionData.answer],
+        });
+        incorrectSound.play();
+      }
+      options.forEach(option => option.disabled = true);
+      setTimeout(() => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+          showQuestion();
+          resetTimer();
+        } else {
+          endQuiz();
+        }
+      }, 1000);
+    }
+
+    function addTime(seconds) {
+      timeRemaining += seconds;
+      timeLimit += seconds; // Increase the total time limit
+      showTimeAdded(seconds);
+      updateTimerDisplay();
+      blinkTimerBar();
+    }
+
+    function showTimeAdded(seconds) {
+      const timeAddedElement = document.getElementById('time-added');
+      timeAddedElement.textContent = `+${seconds}s`;
+      timeAddedElement.style.opacity = '1';
+      setTimeout(() => {
+        timeAddedElement.style.opacity = '0';
+      }, 2000);
+    }
+
+    function blinkTimerBar() {
+      const timerBar = document.getElementById('timer-bar');
+      timerBar.classList.add('add-time');
+      setTimeout(() => {
+        timerBar.classList.remove('add-time');
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const percentage = (timeRemaining / timeLimit) * 100;
+      timerBar.style.width = `${percentage}%`;
+
+      if (timeRemaining <= 10) {
+        timerBar.style.backgroundColor = '#e74c3c';
+      } else {
+        timerBar.style.backgroundColor = '#1abc9c';
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      timerBar = document.getElementById('timer-bar');
+      updateTimerDisplay();
+
+      timer = setInterval(() => {
+        timeRemaining--;
+        if (timeRemaining < 0) {
+          timeRemaining = 0;
+        }
+        if (timeRemaining === 5) {
+          playAlertSound();
+        }
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+          clearInterval(timer);
+          endQuizDueToTimeout();
+        }
+      }, 1000);
+    }
+
+    function playAlertSound() {
+  const alertSound = document.getElementById('timeout-sound');
+  if (alertSound.readyState >= 2) {
+    alertSound.play().catch(error => {
+      console.error("Erro ao tocar o áudio: ", error);
+    });
+  } else {
+    alertSound.oncanplaythrough = () => {
+      alertSound.play().catch(error => {
+        console.error("Erro ao tocar o áudio: ", error);
+      });
+    };
+  }
+}
+
+
+    function endQuizDueToTimeout() {
+      const timeoutSound = document.getElementById('timeout-sound');
+      timeoutSound.pause();
+      timeoutSound.currentTime = 0; // Reset the audio
+      document.querySelector('.question-container').style.display = 'none';
+      showResult();
+    }
+
+    function endQuiz() {
+      clearInterval(timer);
+      const endSound = document.getElementById('end-sound');
+      endSound.play();
+      document.querySelector('.question-container').style.display = 'none';
+      showResult();
+    }
+
+    function showResult() {
+      document.getElementById('quiz').classList.remove('active');
+      document.getElementById('result').classList.remove('hidden');
+      document.getElementById('result-message').textContent = "Quiz Concluído!";
+      document.getElementById('score').textContent = `Você acumulou ${score} pontos.`;
+    }
+
+    function showFeedback() {
+      document.getElementById('result').classList.add('hidden');
+      const feedbackContainer = document.getElementById('feedback');
+      feedbackContainer.style.display = 'flex';
+      const incorrectQuestionsContainer = feedbackContainer.querySelector('.incorrect-questions');
+      incorrectQuestionsContainer.innerHTML = '';
+      incorrectQuestions.forEach(item => {
+        const questionElement = document.createElement('div');
+        questionElement.classList.add('incorrect-question');
+        questionElement.innerHTML = `
+          <p><strong>Pergunta:</strong> ${item.question}</p>
+          <p><strong>Sua resposta:</strong> <span class="incorrect-answer">${item.selected}</span></p>
+          <p><strong>Resposta correta:</strong> <span class="correct-answer">${item.correct}</span></p>
+        `;
+        incorrectQuestionsContainer.appendChild(questionElement);
+      });
+    }
+
+    function restartQuiz() {
+      window.location.href = 'index.html';
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array.slice(0, 10);
+    }
+
+    function updateScoreDisplay() {
+      document.getElementById('score-display').textContent = `Pontuação: ${score}`;
+    }
+
+    function animateScoreIncrement() {
+      const scoreDisplay = document.getElementById('score-display');
+      scoreDisplay.style.animation = 'none';
+      scoreDisplay.offsetHeight; // trigger reflow
+      scoreDisplay.style.animation = 'fadeInScore 1s ease-in-out';
+    }
+
+    function preloadAudio() {
+      const sounds = ['correct-sound', 'incorrect-sound', 'timeout-sound', 'end-sound'];
+      sounds.forEach(soundId => {
+        const sound = document.getElementById(soundId);
+        sound.load();
+      });
+    }
+  </script>
+</body>
+</html>
